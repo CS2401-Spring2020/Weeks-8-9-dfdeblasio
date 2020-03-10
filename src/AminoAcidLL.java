@@ -236,10 +236,79 @@ class AminoAcidLL{
     return rtn;
   }
 
+  /********************************************************************************************/
+  /* sorts a list by amino acid character 
+   * using  either merge or insertion sort*/
+  public static AminoAcidLL sort(AminoAcidLL inList){
+	  return mergeSort(inList);
+	  //return insertSort(inList);
+  }
 
   /********************************************************************************************/
-  /* sorts a list by amino acid character*/
-  public static AminoAcidLL sort(AminoAcidLL inList){
+  /* sorts a list by amino acid character using merge sort*/
+  public static AminoAcidLL mergeSort(AminoAcidLL inList){
+    if(inList.next == null) return inList;
+    
+    // count the number of nodes 
+    int ctr = 0;
+    AminoAcidLL current = inList;
+    while(current != null) {
+    	current = current.next;
+    	ctr++;
+    }
+    
+    // create right to point to the second half (and clip the two lists).
+    AminoAcidLL left = inList;
+    current = inList;
+    for(int i=0; i<ctr/2-1; i++) {
+    	current = current.next;
+    }
+    AminoAcidLL right = current.next;
+    current.next = null;
+    
+    // sort the shorter lists
+    left = mergeSort(left);
+    right = mergeSort(right);
+    
+    //merge 
+    
+    //set fist node
+    AminoAcidLL rtn;
+    if(left.aminoAcid < right.aminoAcid) {
+    	rtn = left;
+    	left = left.next;
+    	rtn.next = null;
+    }else {
+    	rtn = right;
+    	right = right.next;
+    	rtn.next = null;
+    }
+    AminoAcidLL back = rtn;
+    
+    // combine the rest of the nodes
+    while(left != null && right != null) {
+    	if(left.aminoAcid < right.aminoAcid) {
+    		back.next = left;
+    		left = left.next;
+    		back = back.next;
+    		back.next = null;
+    	}else {
+    		back.next = right;
+    		right = right.next;
+    		back = back.next;
+    		back.next = null;
+    	}
+    }
+    //these cant both be true;
+    if(left!=null) back.next = left;
+    if(right!=null) back.next = right;
+    
+    return rtn;
+  }
+  
+  /********************************************************************************************/
+  /* sorts a list by amino acid character using indertion sort*/
+  public static AminoAcidLL insertSort(AminoAcidLL inList){
     //using insertionSort
     if(inList == null) return inList;
     AminoAcidLL rtn = inList;
