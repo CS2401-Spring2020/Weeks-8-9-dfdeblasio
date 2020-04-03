@@ -59,6 +59,14 @@ class AminoAcidLL{
     }
     return total;
   }
+  
+  /********************************************************************************************/
+  /* Shortcut to find the total number of codons in the rest of the list */
+  private int countRest(){
+    int total = totalCount();
+    if(next != null) total += next.countRest();
+    return total;
+  }
 
   /********************************************************************************************/
   /* Recursive method that finds the differences in **Amino Acid** counts. 
@@ -71,30 +79,29 @@ class AminoAcidLL{
 
     // if the comparison list is empty, the difference is the sum of the rest of the lists' counts
     if(inList == null){
-      diff += totalCount();
-      if(next != null){
-        diff += next.aminoAcidCompare(inList);
-      }
-
-
+      return countRest();
     }
     // the two nodes match, add the difference in counts from the rest of the list to this one and return the total. 
     else if(inList.aminoAcid == aminoAcid){
       diff = Math.abs(totalCount()-inList.totalCount());
-      if(next != null){
+      if(next != null && inList.next != null){
         diff += next.aminoAcidCompare(inList.next);
-      }if(next == null && inList.next != null){
-        diff += aminoAcidCompare(inList.next);
+      }else if(next == null && inList.next != null){
+        diff += inList.next.countRest();
+      }else if(next != null && inList.next == null){
+        diff += next.countRest();
       }
 
       // need to find out if something later in my list matches the current, 
       // but since I don't have a match my total count gets added to the difference
     }
 
-    else if(next != null && aminoAcid < inList.aminoAcid){
+    else if(aminoAcid < inList.aminoAcid){
       diff += totalCount();
       if(next != null){
         diff += next.aminoAcidCompare(inList);
+      }else if(next == null){
+        diff += inList.countRest();
       }
 
       // need to find out if something later in *their* list matches me, 
@@ -102,10 +109,12 @@ class AminoAcidLL{
       // also if I don't have anything else keep adding their total to the difference
     }
 
-    else if(next == null || aminoAcid > inList.aminoAcid){
+    else if(aminoAcid > inList.aminoAcid){
       diff += inList.totalCount();
       if(inList.next != null){
         diff += aminoAcidCompare(inList.next);
+      }else if(inList.next == null){
+        diff += countRest();
       }
 
     }
@@ -133,37 +142,40 @@ class AminoAcidLL{
 
     // if the comparison list is empty, the difference is the sum of the rest of the lists' counts
     if(inList == null){
-      diff += totalCount();
-      if(next != null){
-        diff += next.codonCompare(inList);
-      }
+      return countRest();
     }
 
     // the two nodes match, add the difference in counts from the rest of the list to this one and return the total. 
     else if(aminoAcid == inList.aminoAcid){
       diff = codonDiff(inList);
-      if(next != null){
+      if(next != null && inList.next != null){
         diff += next.codonCompare(inList.next);
-      }if(next == null && inList.next != null){
-        diff += codonCompare(inList.next);
+      }else if(next == null && inList.next != null){
+        diff += inList.next.countRest();
+      }else if(next != null && inList.next == null){
+        diff += next.countRest();
       }
 
 
       // need to find out if something later in my list matches the current, 
       // but since I don't have a match my total count gets added to the difference
-    }else if(next != null && aminoAcid < inList.aminoAcid){
+    }else if(aminoAcid < inList.aminoAcid){
       diff += totalCount();
       if(next != null){
-        diff +=  next.codonCompare(inList);
+        diff += next.codonCompare(inList);
+      }else if(next == null){
+        diff += inList.countRest();
       }
 
       // need to find out if something later in *their* list matches me, 
       // but since they don't have a match in my list their total count gets added to the difference
       // also if I don't have anything else keep adding their total to the difference
-    }else if(next == null || aminoAcid > inList.aminoAcid){
+    }else if(aminoAcid > inList.aminoAcid){
       diff += inList.totalCount();
       if(inList.next != null){
-        diff +=  codonCompare(inList.next);
+        diff += codonCompare(inList.next);
+      }else if(inList.next == null){
+        diff += countRest();
       }
     }
 
